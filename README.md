@@ -1,6 +1,6 @@
 # Tic-Tac-Toe
 
-Classic Two Player Tic Tac Toe game.
+Classic two player game on a 3x3 board.
 
 Future Goals:
 1. Implement a computer player
