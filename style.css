@@ -1,0 +1,175 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Lato", sans-serif;
+  color: white;
+  background-color: lightgray;
+}
+
+h1 {
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+h3 {
+  font-size: 18px;
+  margin-top: 24px;
+}
+
+
+/* Game Board */
+#game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 640px;
+  height: 100%;
+  padding: 25px;
+  margin: 0 auto;
+  margin-top: 50px;
+
+  background-color: cornflowerblue;
+  border-radius: 20px;
+  box-shadow: 5px 5px 5px gray;
+}
+
+#board {
+  display: flex;
+  flex-flow: row wrap;
+  width: 450px;
+  margin-top: 24px;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 150px;
+  width: 150px;
+
+  color: white;
+  font-size: 145px;
+}
+
+.cell:hover {
+  box-shadow: 0 0 5px 0.1rem white;
+}
+
+.cell:active {
+  transform: translateY(0.5vh);
+}
+
+.cell:nth-child(3n + 2) {
+  border-left: 5px solid white;
+  border-right: 5px solid white;
+}
+
+.cell:nth-child(n + 4):nth-child(-n + 6) {
+  border-top: 5px solid white;
+  border-bottom: 5px solid white;
+}
+
+
+/* Buttons */
+button {
+  margin: 24px;
+  padding: 5px;
+  border-radius: 5px;
+  margin-top: 50px;
+  border: none;
+}
+
+#startButton {
+  color: white;
+  background-color: forestgreen;
+  font-size: 36px;
+}
+
+#resetButton {
+  color: white;
+  background-color: coral;
+  font-size: 24px;
+}
+
+button:hover {
+  box-shadow: 3px 3px 3px black;
+}
+
+button:active {
+  transform: translateY(0.5vh);
+}
+
+
+/* SideBar */
+#sidebar {
+  background: cornflowerblue;
+  position: fixed;
+  top: 20vh;
+  right: 0;
+  width: 200px;
+  height: 550px;
+  padding: 20px 0;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px gray;
+}
+
+#options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 1.2rem;
+  padding: 5px;
+}
+
+#playerOneName ,#playerTwoName {
+  padding: 2px;
+  margin-bottom: 16px;
+}
+
+#github {
+  display: flex;
+  flex-flow: column wrap;
+  align-items: flex-end;
+  margin-top: 180px;
+  padding-right: 5px;
+}
+
+#github img {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+
+/* Media Queries */
+@media screen and (max-width: 1000px) {
+  #sidebar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+    height: auto;
+  }
+
+  #github {
+    margin-top: 50px;
+    padding-right: 5px;
+  }
+}
