@@ -1,5 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Lato&display=swap");
 
+:root {
+  --cellHeight: 150px;
+  --cellWidth: 150px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -37,7 +42,7 @@ h3 {
   align-items: center;
   justify-content: center;
 
-  width: 640px;
+  width: calc(var(--cellWidth) * 3 + 190px);
   height: 100%;
   padding: 25px;
   margin: 0 auto;
@@ -51,7 +56,7 @@ h3 {
 #board {
   display: flex;
   flex-flow: row wrap;
-  width: 450px;
+  width: calc(var(--cellWidth) * 3);
   margin-top: 24px;
 }
 
@@ -60,8 +65,8 @@ h3 {
   align-items: center;
   justify-content: center;
 
-  height: 150px;
-  width: 150px;
+  height: var(--cellHeight);
+  width: var(--cellWidth);
 
   color: white;
   font-size: 145px;
