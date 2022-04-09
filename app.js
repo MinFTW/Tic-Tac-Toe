@@ -65,7 +65,8 @@ let onStartClick = () => {
     for (const [key, cell] of Object.entries(cellMap)) {
         cell.isAvailable = true;
     }
-
+    
+    enableBoardClick();
     setPlayers();
 }
 
@@ -89,6 +90,7 @@ let setPlayers = () => {
     message.innerText = `${game.currentPlayer.playerName} starts first`;
     
     if (game.currentPlayer.playerName === `Computer` && game.isPlayerTwoComputer) {
+        disableBoardClick();     
         setTimeout(runComputerPlayerTurn, 800);
     }
 }
@@ -108,13 +110,12 @@ let onBoardClick = (e) => {
         return;
     }
 
-    if (clickCount === 0) {
-        message.innerText = `It's a draw!`;
+    if(checkWinner()) {
         gameOver();
         return;
     }
-
-    if(checkWinner()) {
+    else if (clickCount === 0) {
+        message.innerText = `It's a draw!`;
         gameOver();
         return;
     }
@@ -123,6 +124,7 @@ let onBoardClick = (e) => {
     message.innerText = `${game.currentPlayer.playerName}'s turn`;
     
     if (game.isPlayerTwoComputer === true && game.currentPlayer === game.playerTwo) {
+        disableBoardClick();
         setTimeout(runComputerPlayerTurn, 800);
     }
 }
@@ -229,11 +231,14 @@ let runComputerPlayerTurn = () => {
     else if (clickCount === 0) {
         message.innerText = `It's a draw!`;
         gameOver();
+        return;
     }
     else if (!checkWinner() && clickCount > 0) {
         game.currentPlayer = (game.currentPlayer === game.playerTwo) ? game.playerOne : game.playerTwo;
         message.innerText = `${game.currentPlayer.playerName}'s turn`;
     }
+    
+    enableBoardClick();
 }
 
 
@@ -252,6 +257,22 @@ let newGame = () => {
         cell.isAvailable = true;
         cell.value = null;
         cell.isAvailable = false;
+    }
+
+    enableBoardClick();
+}
+
+
+let enableBoardClick = () => {
+    for (let cell of cells) {
+        cell.addEventListener(`click`, onBoardClick);
+    }
+}
+
+
+let disableBoardClick = () => {
+    for (let cell of cells) {
+        cell.removeEventListener(`click`, onBoardClick);
     }
 }
 
@@ -276,10 +297,6 @@ let gameModeSelect = document.getElementById(`gameModeSelect`);
 
 
 // EVENT LISTENERS
-for (let cell of cells) {
-    cell.addEventListener(`click`, onBoardClick);
-}
-
 startButton.addEventListener(`click`, onStartClick);
 resetButton.addEventListener(`click`, newGame);
 
