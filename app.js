@@ -29,14 +29,19 @@ class Player {
 
 
 class Cell {    
+    cellId;
     coordinates;
     value;
     isAvailable = true;
+
+    constructor(cellId) {
+        this.cellId = cellId;
+    }
 }
 
 
 // FUNCTIONS
-function createBoard() {
+let createBoard = () => {
     for (let i = 0; i < rows * cols; i++) {
         let board = document.getElementById(`board`);
         let cell = document.createElement(`div`);
@@ -45,14 +50,14 @@ function createBoard() {
         cell.id = i;
         board.append(cell);
 
-        cellMap[i] = new Cell();
+        cellMap[i] = new Cell(i);
     }
 }
 
 createBoard();
 
 
-function onStartClick() {
+let onStartClick = () => {
     game = new Game();
     startButton.disabled = true;
     startButton.style.backgroundColor = `lightgray`;
@@ -65,7 +70,7 @@ function onStartClick() {
 }
 
 
-function setPlayers() {
+let setPlayers = () => {
     let playerOneName = playerOneNameInput.value;
     let playerTwoName = playerTwoNameInput.value;
     
@@ -84,12 +89,12 @@ function setPlayers() {
     message.innerText = `${game.currentPlayer.playerName} starts first`;
     
     if (game.currentPlayer.playerName === `Computer` && game.isPlayerTwoComputer) {
-        setTimeout(runComputerPlayerTurn, Math.floor(Math.random() * 800));
+        setTimeout(runComputerPlayerTurn, 800);
     }
 }
 
 
-function onBoardClick(e) {
+let onBoardClick = (e) => {
     let cellId = e.target.id;
     let currentCell = cellMap[cellId];
     
@@ -118,12 +123,12 @@ function onBoardClick(e) {
     message.innerText = `${game.currentPlayer.playerName}'s turn`;
     
     if (game.isPlayerTwoComputer === true && game.currentPlayer === game.playerTwo) {
-        setTimeout(runComputerPlayerTurn, Math.floor(Math.random() * 800));
+        setTimeout(runComputerPlayerTurn, 800);
     }
-};
+}
 
 
-function checkWinner() {
+let checkWinner = () => {
     let board = [];
 
     for (const [key, cell] of Object.entries(cellMap)) {
@@ -180,7 +185,7 @@ function checkWinner() {
         return winnerAnnouncement(board[0]);
     }
     else if (board[2] === board[4] && board[2] === board[6] && board[2] != null) {
-        for (let i = 2; i < rows * cols; i += 2) {
+        for (let i = 2; i < rows * cols - 1; i += 2) {
             document.getElementById(i).style.color = `tomato`;
         }
 
@@ -192,7 +197,7 @@ function checkWinner() {
 }
 
 
-function winnerAnnouncement(winningValue) {
+let winnerAnnouncement = (winningValue) => {
     let winningPlayerName = ``;
 
     winningPlayerName = (winningValue === game.playerOne.playerMark) ? game.playerOne.playerName : game.playerTwo.playerName
@@ -202,27 +207,29 @@ function winnerAnnouncement(winningValue) {
 }
 
 
-function runComputerPlayerTurn() {
+let runComputerPlayerTurn = () => { 
+    let openCells = [];
+
     for (const [key, cell] of Object.entries(cellMap)) {
         if (cell.isAvailable) {
-            cell.value = game.currentPlayer.playerMark;
-            document.getElementById(key).innerText = game.currentPlayer.playerMark;
-            cell.isAvailable = false;
-            clickCount--;
-            break;
+            openCells.push(cell);
         } 
     }
+
+    let randomCell = openCells[Math.floor(Math.random() * openCells.length)];
+    randomCell.value = game.currentPlayer.playerMark;
+    document.getElementById(randomCell.cellId).innerText = game.currentPlayer.playerMark;
+    randomCell.isAvailable = false;
+    clickCount--;
 
     if(checkWinner()) {
         gameOver();
         return;
     }
-
-    if (clickCount === 0) {
+    else if (clickCount === 0) {
         message.innerText = `It's a draw!`;
         gameOver();
     }
-    
     else if (!checkWinner() && clickCount > 0) {
         game.currentPlayer = (game.currentPlayer === game.playerTwo) ? game.playerOne : game.playerTwo;
         message.innerText = `${game.currentPlayer.playerName}'s turn`;
@@ -230,7 +237,7 @@ function runComputerPlayerTurn() {
 }
 
 
-function newGame() {
+let newGame = () => {
     clickCount = rows * cols;
     startButton.disabled = false;
     startButton.style.backgroundColor = `forestgreen`;
@@ -249,7 +256,7 @@ function newGame() {
 }
 
 
-function gameOver() {
+let gameOver = () => {
     for (const [key, cell] of Object.entries(cellMap)) {
         cell.isAvailable = false;
     }
@@ -276,4 +283,4 @@ for (let cell of cells) {
 startButton.addEventListener(`click`, onStartClick);
 resetButton.addEventListener(`click`, newGame);
 
-gameModeSelect.addEventListener(`change`, () =>  playerTwoNameInput.disabled = (gameModeSelect.value === `computer`) ?  true : false);
+gameModeSelect.addEventListener(`change`, () => playerTwoNameInput.disabled = (gameModeSelect.value === `computer`) ? true : false);
