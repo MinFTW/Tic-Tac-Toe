@@ -27,7 +27,6 @@ class Player {
 
 class Cell {
   cellId;
-  coordinates;
   value;
   isAvailable = true;
 
@@ -37,10 +36,10 @@ class Cell {
 }
 
 // FUNCTIONS
-let createBoard = () => {
+const createBoard = () => {
   for (let i = 0; i < rows * cols; i++) {
-    let board = document.getElementById(`board`);
-    let cell = document.createElement(`div`);
+    const board = document.getElementById(`board`);
+    const cell = document.createElement(`div`);
 
     cell.classList.add(`cell`);
     cell.id = i;
@@ -49,10 +48,11 @@ let createBoard = () => {
     cellMap[i] = new Cell(i);
   }
 };
+console.log(cellMap);
 
 createBoard();
 
-let onStartClick = () => {
+const onStartClick = () => {
   game = new Game();
   startButton.disabled = true;
   startButton.style.backgroundColor = `lightgray`;
@@ -65,7 +65,7 @@ let onStartClick = () => {
   setPlayers();
 };
 
-let setPlayers = () => {
+const setPlayers = () => {
   let playerOneName = playerOneNameInput.value;
   let playerTwoName = playerTwoNameInput.value;
 
@@ -95,7 +95,7 @@ let setPlayers = () => {
   }
 };
 
-let onBoardClick = (e) => {
+const onBoardClick = (e) => {
   let cellId = e.target.id;
   let currentCell = cellMap[cellId];
 
@@ -130,7 +130,7 @@ let onBoardClick = (e) => {
   }
 };
 
-let checkWinner = () => {
+const checkWinner = () => {
   let board = [];
 
   for (const [key, cell] of Object.entries(cellMap)) {
@@ -202,13 +202,13 @@ let checkWinner = () => {
   }
 };
 
-let styleWinner = (cell1, cell2, cell3) => {
+const styleWinner = (cell1, cell2, cell3) => {
   document.getElementById(cell1).style.color = `tomato`;
   document.getElementById(cell2).style.color = `tomato`;
   document.getElementById(cell3).style.color = `tomato`;
 };
 
-let winnerAnnouncement = (winningValue) => {
+const winnerAnnouncement = (winningValue) => {
   let winningPlayerName = ``;
 
   winningPlayerName =
@@ -220,7 +220,7 @@ let winnerAnnouncement = (winningValue) => {
   return true;
 };
 
-let runComputerPlayerTurn = () => {
+const runComputerPlayerTurn = () => {
   let openCells = [];
 
   for (const [key, cell] of Object.entries(cellMap)) {
@@ -252,13 +252,13 @@ let runComputerPlayerTurn = () => {
   enableBoardClick();
 };
 
-let newGame = () => {
+const newGame = () => {
   clickCount = rows * cols;
   startButton.disabled = false;
   startButton.style.backgroundColor = `forestgreen`;
   message.innerText = `Press Start to Play`;
 
-  for (let cell of cells) {
+  for (const cell of cells) {
     cell.innerText = ``;
     cell.style = `white`;
   }
@@ -272,34 +272,34 @@ let newGame = () => {
   enableBoardClick();
 };
 
-let enableBoardClick = () => {
-  for (let cell of cells) {
+const enableBoardClick = () => {
+  for (const cell of cells) {
     cell.addEventListener(`click`, onBoardClick);
   }
 };
 
-let disableBoardClick = () => {
-  for (let cell of cells) {
+const disableBoardClick = () => {
+  for (const cell of cells) {
     cell.removeEventListener(`click`, onBoardClick);
   }
 };
 
-let gameOver = () => {
+const gameOver = () => {
   for (const [key, cell] of Object.entries(cellMap)) {
     cell.isAvailable = false;
   }
 };
 
 // DOM ELEMENTS
-let cells = document.getElementsByClassName(`cell`);
-let message = document.getElementById(`message`);
+const cells = document.getElementsByClassName(`cell`);
+const message = document.getElementById(`message`);
 
-let startButton = document.getElementById('startButton');
-let resetButton = document.getElementById('resetButton');
+const startButton = document.getElementById('startButton');
+const resetButton = document.getElementById('resetButton');
 
-let playerOneNameInput = document.getElementById('playerOneName');
-let playerTwoNameInput = document.getElementById('playerTwoName');
-let gameModeSelect = document.getElementById(`gameModeSelect`);
+const playerOneNameInput = document.getElementById('playerOneName');
+const playerTwoNameInput = document.getElementById('playerTwoName');
+const gameModeSelect = document.getElementById(`gameModeSelect`);
 
 // EVENT LISTENERS
 startButton.addEventListener(`click`, onStartClick);
