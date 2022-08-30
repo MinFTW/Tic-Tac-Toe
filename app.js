@@ -49,7 +49,7 @@ const createBoard = () => {
   }
 };
 
-const createresetGame = () => {
+const startNewGame = () => {
   game = new Game();
   startButton.disabled = true;
   startButton.style.backgroundColor = `lightgray`;
@@ -59,7 +59,7 @@ const createresetGame = () => {
   }
 
   enableBoardClick();
-  setPlayers();
+  setPlayersNames();
 };
 
 const handleBoardClick = (e) => {
@@ -79,22 +79,12 @@ const handleBoardClick = (e) => {
     gameOver();
     return;
   } else if (clickCount === 0) {
-    message.innerText = `It's a draw!`;
+    drawMessage();
     gameOver();
     return;
   }
 
-  game.currentPlayer =
-    game.currentPlayer === game.playerTwo ? game.playerOne : game.playerTwo;
-  message.innerText = `${game.currentPlayer.playerName}'s turn`;
-
-  if (
-    game.isPlayerTwoComputer === true &&
-    game.currentPlayer === game.playerTwo
-  ) {
-    disableBoardClick();
-    setTimeout(handleComputerPlayerTurn, 800);
-  }
+  handlePlayersTurns();
 };
 
 const resetGame = () => {
@@ -132,7 +122,7 @@ const disableBoardClick = () => {
 createBoard();
 
 //  PLAYER FUNCTIONS
-const setPlayers = () => {
+const setPlayersNames = () => {
   let playerOneName = playerOneNameInput.value;
   let playerTwoName = playerTwoNameInput.value;
 
@@ -148,6 +138,11 @@ const setPlayers = () => {
 
   game.playerOne = new Player((playerName = playerOneName), (playerMark = `X`));
   game.playerTwo = new Player((playerName = playerTwoName), (playerMark = `O`));
+
+  handleFirstTurn();
+};
+
+const handleFirstTurn = () => {
   game.currentPlayer =
     Math.floor(Math.random() * 2) === 0 ? game.playerOne : game.playerTwo;
 
@@ -162,13 +157,25 @@ const setPlayers = () => {
   }
 };
 
+const handlePlayersTurns = () => {
+  game.currentPlayer =
+    game.currentPlayer === game.playerTwo ? game.playerOne : game.playerTwo;
+  message.innerText = `${game.currentPlayer.playerName}'s turn`;
+
+  if (
+    game.isPlayerTwoComputer === true &&
+    game.currentPlayer === game.playerTwo
+  ) {
+    disableBoardClick();
+    setTimeout(handleComputerPlayerTurn, 800);
+  }
+};
+
 const handleComputerPlayerTurn = () => {
   let openCells = [];
 
   for (const cell of Object.values(cellMap)) {
-    if (cell.isAvailable) {
-      openCells.push(cell);
-    }
+    if (cell.isAvailable) openCells.push(cell);
   }
 
   let randomCell = openCells[Math.floor(Math.random() * openCells.length)];
@@ -182,7 +189,7 @@ const handleComputerPlayerTurn = () => {
     gameOver();
     return;
   } else if (clickCount === 0) {
-    message.innerText = `It's a draw!`;
+    drawMessage();
     gameOver();
     return;
   } else if (!checkWinner() && clickCount > 0) {
@@ -195,6 +202,10 @@ const handleComputerPlayerTurn = () => {
 };
 
 //  GAME STATE FUNCTIONS
+const checkThree = (a, b, c) => {
+  return a === b && b === c && a != null;
+};
+
 const checkWinner = () => {
   let board = [];
 
@@ -202,63 +213,35 @@ const checkWinner = () => {
     board.push(cell.value);
   }
 
-  if (board[0] === board[1] && board[0] === board[2] && board[0] != null) {
+  if (checkThree(board[0], board[1], board[2])) {
     styleWinner(0, 1, 2);
 
     return winnerMessage(board[0]);
-  } else if (
-    board[3] === board[4] &&
-    board[3] === board[5] &&
-    board[3] != null
-  ) {
+  } else if (checkThree(board[3], board[4], board[5])) {
     styleWinner(3, 4, 5);
 
     return winnerMessage(board[3]);
-  } else if (
-    board[6] === board[7] &&
-    board[6] === board[8] &&
-    board[6] != null
-  ) {
+  } else if (checkThree(board[6], board[7], board[8])) {
     styleWinner(6, 7, 8);
 
     return winnerMessage(board[6]);
-  } else if (
-    board[0] === board[3] &&
-    board[0] === board[6] &&
-    board[0] != null
-  ) {
+  } else if (checkThree(board[0], board[3], board[6])) {
     styleWinner(0, 3, 6);
 
     return winnerMessage(board[0]);
-  } else if (
-    board[1] === board[4] &&
-    board[1] === board[7] &&
-    board[1] != null
-  ) {
+  } else if (checkThree(board[1], board[4], board[7])) {
     styleWinner(1, 4, 7);
 
     return winnerMessage(board[1]);
-  } else if (
-    board[2] === board[5] &&
-    board[2] === board[8] &&
-    board[2] != null
-  ) {
+  } else if (checkThree(board[2], board[5], board[8])) {
     styleWinner(2, 5, 8);
 
     return winnerMessage(board[2]);
-  } else if (
-    board[0] === board[4] &&
-    board[0] === board[8] &&
-    board[0] != null
-  ) {
+  } else if (checkThree(board[0], board[4], board[8])) {
     styleWinner(0, 4, 8);
 
     return winnerMessage(board[0]);
-  } else if (
-    board[2] === board[4] &&
-    board[2] === board[6] &&
-    board[2] != null
-  ) {
+  } else if (checkThree(board[2], board[4], board[6])) {
     styleWinner(2, 4, 6);
 
     return winnerMessage(board[2]);
@@ -285,6 +268,10 @@ const winnerMessage = (winningValue) => {
   return true;
 };
 
+const drawMessage = () => {
+  message.innerText = `It's a draw!`;
+};
+
 const gameOver = () => {
   for (const cell of Object.values(cellMap)) {
     cell.isAvailable = false;
@@ -303,7 +290,7 @@ const playerTwoNameInput = document.getElementById('playerTwoName');
 const gameModeSelect = document.getElementById(`gameModeSelect`);
 
 // EVENT LISTENERS
-startButton.addEventListener(`click`, createresetGame);
+startButton.addEventListener(`click`, startNewGame);
 resetButton.addEventListener(`click`, resetGame);
 
 gameModeSelect.addEventListener(
