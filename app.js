@@ -3,7 +3,18 @@ let game;
 let cellMap = {};
 let rows = 3;
 let cols = 3;
-let clickCount = rows * cols;
+let clickCount;
+
+const winConditions = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
+];
 
 // GAME OBJECTS
 class Game {
@@ -51,20 +62,17 @@ const createBoard = () => {
 
 const startNewGame = () => {
   game = new Game();
+  clickCount = rows * cols;
   startButton.disabled = true;
   startButton.style.backgroundColor = `lightgray`;
 
-  for (const cell of Object.values(cellMap)) {
-    cell.isAvailable = true;
-  }
-
+  resetBoard();
   enableBoardClick();
   setPlayersNames();
 };
 
 const handleBoardClick = (e) => {
-  let cellId = e.target.id;
-  let currentCell = cellMap[cellId];
+  let currentCell = cellMap[e.target.id];
 
   if (currentCell.isAvailable) {
     currentCell.value = game.currentPlayer.playerMark;
@@ -75,20 +83,10 @@ const handleBoardClick = (e) => {
     return;
   }
 
-  if (checkWinner()) {
-    gameOver();
-    return;
-  } else if (clickCount === 0) {
-    drawMessage();
-    gameOver();
-    return;
-  }
-
-  handlePlayersTurns();
+  checkWinner();
 };
 
 const resetGame = () => {
-  clickCount = rows * cols;
   startButton.disabled = false;
   startButton.style.backgroundColor = `forestgreen`;
   message.innerText = `Press Start to Play`;
@@ -98,13 +96,15 @@ const resetGame = () => {
     cell.style = `white`;
   }
 
+  resetBoard();
+  enableBoardClick();
+};
+
+const resetBoard = () => {
   for (const cell of Object.values(cellMap)) {
     cell.isAvailable = true;
     cell.value = null;
-    cell.isAvailable = false;
   }
-
-  enableBoardClick();
 };
 
 const enableBoardClick = () => {
@@ -123,44 +123,36 @@ createBoard();
 
 //  PLAYER FUNCTIONS
 const setPlayersNames = () => {
-  let playerOneName = playerOneNameInput.value;
-  let playerTwoName = playerTwoNameInput.value;
+  let playerOneName = playerOneNameInput.value
+    ? playerOneNameInput.value
+    : game.defaultPlayerOneName;
+  let playerTwoName = playerTwoNameInput.value
+    ? playerTwoNameInput.value
+    : game.defaultPlayerTwoName;
 
   if (gameModeSelect.value === `computer`) {
     game.isPlayerTwoComputer = true;
     playerTwoName = `Computer`;
   }
 
-  playerOneName =
-    playerOneName != `` ? playerOneName : game.defaultPlayerOneName;
-  playerTwoName =
-    playerTwoName != `` ? playerTwoName : game.defaultPlayerTwoName;
-
   game.playerOne = new Player((playerName = playerOneName), (playerMark = `X`));
   game.playerTwo = new Player((playerName = playerTwoName), (playerMark = `O`));
 
-  handleFirstTurn();
-};
-
-const handleFirstTurn = () => {
-  game.currentPlayer =
-    Math.floor(Math.random() * 2) === 0 ? game.playerOne : game.playerTwo;
-
-  message.innerText = `${game.currentPlayer.playerName} starts first`;
-
-  if (
-    game.currentPlayer.playerName === `Computer` &&
-    game.isPlayerTwoComputer
-  ) {
-    disableBoardClick();
-    setTimeout(handleComputerPlayerTurn, 800);
-  }
+  handlePlayersTurns();
 };
 
 const handlePlayersTurns = () => {
-  game.currentPlayer =
-    game.currentPlayer === game.playerTwo ? game.playerOne : game.playerTwo;
-  message.innerText = `${game.currentPlayer.playerName}'s turn`;
+  if (clickCount === 9) {
+    game.currentPlayer =
+      Math.floor(Math.random() * 2) === 0 ? game.playerOne : game.playerTwo;
+
+    message.innerText = `${game.currentPlayer.playerName} starts first`;
+  } else {
+    game.currentPlayer =
+      game.currentPlayer === game.playerTwo ? game.playerOne : game.playerTwo;
+
+    message.innerText = `${game.currentPlayer.playerName}'s turn`;
+  }
 
   if (
     game.isPlayerTwoComputer === true &&
@@ -179,33 +171,16 @@ const handleComputerPlayerTurn = () => {
   }
 
   let randomCell = openCells[Math.floor(Math.random() * openCells.length)];
-  randomCell.value = game.currentPlayer.playerMark;
-  document.getElementById(randomCell.cellId).innerText =
-    game.currentPlayer.playerMark;
+  randomCell.value = 'O';
+  document.getElementById(randomCell.cellId).innerText = 'O';
   randomCell.isAvailable = false;
   clickCount--;
 
-  if (checkWinner()) {
-    gameOver();
-    return;
-  } else if (clickCount === 0) {
-    drawMessage();
-    gameOver();
-    return;
-  } else if (!checkWinner() && clickCount > 0) {
-    game.currentPlayer =
-      game.currentPlayer === game.playerTwo ? game.playerOne : game.playerTwo;
-    message.innerText = `${game.currentPlayer.playerName}'s turn`;
-  }
-
+  checkWinner();
   enableBoardClick();
 };
 
 //  GAME STATE FUNCTIONS
-const checkThree = (a, b, c) => {
-  return a === b && b === c && a != null;
-};
-
 const checkWinner = () => {
   let board = [];
 
@@ -213,69 +188,32 @@ const checkWinner = () => {
     board.push(cell.value);
   }
 
-  if (checkThree(board[0], board[1], board[2])) {
-    styleWinner(0, 1, 2);
-
-    return winnerMessage(board[0]);
-  } else if (checkThree(board[3], board[4], board[5])) {
-    styleWinner(3, 4, 5);
-
-    return winnerMessage(board[3]);
-  } else if (checkThree(board[6], board[7], board[8])) {
-    styleWinner(6, 7, 8);
-
-    return winnerMessage(board[6]);
-  } else if (checkThree(board[0], board[3], board[6])) {
-    styleWinner(0, 3, 6);
-
-    return winnerMessage(board[0]);
-  } else if (checkThree(board[1], board[4], board[7])) {
-    styleWinner(1, 4, 7);
-
-    return winnerMessage(board[1]);
-  } else if (checkThree(board[2], board[5], board[8])) {
-    styleWinner(2, 5, 8);
-
-    return winnerMessage(board[2]);
-  } else if (checkThree(board[0], board[4], board[8])) {
-    styleWinner(0, 4, 8);
-
-    return winnerMessage(board[0]);
-  } else if (checkThree(board[2], board[4], board[6])) {
-    styleWinner(2, 4, 6);
-
-    return winnerMessage(board[2]);
-  } else {
-    return false;
+  for (let i = 0; i < board.length - 1; i++) {
+    const checkThree = winConditions[i];
+    const a = board[checkThree[0]];
+    const b = board[checkThree[1]];
+    const c = board[checkThree[2]];
+    if (a === null || b === null || c === null) continue;
+    if (a === b && b === c) {
+      for (const cell of checkThree) {
+        document.getElementById(cell).style.color = 'tomato';
+      }
+      return winnerMessage();
+    }
   }
+
+  if (clickCount === 0) return drawMessage();
+
+  handlePlayersTurns();
 };
 
-const styleWinner = (cell1, cell2, cell3) => {
-  document.getElementById(cell1).style.color = `tomato`;
-  document.getElementById(cell2).style.color = `tomato`;
-  document.getElementById(cell3).style.color = `tomato`;
-};
-
-const winnerMessage = (winningValue) => {
-  let winningPlayerName = ``;
-
-  winningPlayerName =
-    winningValue === game.playerOne.playerMark
-      ? game.playerOne.playerName
-      : game.playerTwo.playerName;
-  message.innerText = `${winningPlayerName} is the winner!`;
-
-  return true;
+const winnerMessage = () => {
+  message.innerText = `${game.currentPlayer.playerName} is the winner!`;
+  disableBoardClick();
 };
 
 const drawMessage = () => {
   message.innerText = `It's a draw!`;
-};
-
-const gameOver = () => {
-  for (const cell of Object.values(cellMap)) {
-    cell.isAvailable = false;
-  }
 };
 
 // DOM ELEMENTS
